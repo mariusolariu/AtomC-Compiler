@@ -41,14 +41,28 @@ public class SyntacticAnalyzer {
 		//TODO add all the I/O functions of AtomC
 		//to the symbols table
 		
-		addSymbol(symbolsTable, "put_i", ClsEnum.CLS_FUNC);
-		addSymbol(symbolsTable, "get_i", ClsEnum.CLS_FUNC);
-		addSymbol(symbolsTable, "put_c", ClsEnum.CLS_FUNC);
-		addSymbol(symbolsTable, "get_c", ClsEnum.CLS_FUNC);
-		addSymbol(symbolsTable, "put_d", ClsEnum.CLS_FUNC);
-		addSymbol(symbolsTable, "get_d", ClsEnum.CLS_FUNC);
-		addSymbol(symbolsTable, "put_s", ClsEnum.CLS_FUNC);
-		addSymbol(symbolsTable, "get_s", ClsEnum.CLS_FUNC);
+		Symbol extFunc;
+	
+		extFunc = addExtFunc("put_s", createType(TbEnum.TB_VOID, -1));
+		addFuncArg(extFunc, "s", createType(TbEnum.TB_CHAR, 0));
+		
+		extFunc = addExtFunc("put_i", createType(TbEnum.TB_VOID, -1));
+		addFuncArg(extFunc, "i", createType(TbEnum.TB_INT, 0));
+		
+		extFunc = addExtFunc("put_d", createType(TbEnum.TB_VOID, -1));
+		addFuncArg(extFunc, "d", createType(TbEnum.TB_DOUBLE, 0));
+		
+		extFunc = addExtFunc("put_c", createType(TbEnum.TB_VOID, -1));
+		addFuncArg(extFunc, "c", createType(TbEnum.TB_CHAR, 0));
+		
+		extFunc = addExtFunc("get_s", createType(TbEnum.TB_VOID, -1));
+		addFuncArg(extFunc, "s", createType(TbEnum.TB_CHAR, 0));
+		
+		addExtFunc("get_i", createType(TbEnum.TB_INT, -1));
+		addExtFunc("get_d", createType(TbEnum.TB_CHAR, -1));
+		addExtFunc("get_c", createType(TbEnum.TB_DOUBLE, -1));
+		addExtFunc("seconds", createType(TbEnum.TB_DOUBLE, -1));
+		
 	}
 	
 	public boolean eat(T_Type tName) {
@@ -120,12 +134,31 @@ public class SyntacticAnalyzer {
 								
 								if (dst.getTypeBase() == TbEnum.TB_STRUCT){
 									
-									if (src.getS().equals(dst.getS())){
-										
+									if (!src.getS().equals(dst.getS())){
+										tkErr("a structure cannot be converted to another one", currentToken);
+										return;	
 									}
 								}
 						}
 				}
+	
+		tkErr("incompatible types", currentToken);		
+	}
+	
+	private Symbol addExtFunc(String name, Type type){
+		Symbol s = addSymbol(symbolsTable, name, ClsEnum.CLS_EXTFUNC);
+			
+			s.setType(type);
+			
+		return s;
+	}
+	
+	private Symbol addFuncArg(Symbol func, String name, Type type){
+		Symbol args = addSymbol(func.getMembers(), name, ClsEnum.CLS_VAR);
+			
+			args.setType(type);
+			
+		return args;
 	}
 	
 	private void deleteSymbolsAfter(ArrayList<Symbol> list, Symbol target) {
