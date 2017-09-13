@@ -16,4 +16,5 @@ int		count()
 void main()
 {
 	put_i(count());
+
 }
